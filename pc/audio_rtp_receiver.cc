@@ -30,20 +30,20 @@ namespace webrtc {
 
 AudioRtpReceiver::AudioRtpReceiver(rtc::Thread* worker_thread,
                                    std::string receiver_id,
-                                   std::vector<std::string> stream_ids)
+                                   std::vector<std::string> stream_ids,
+                                   PeerConnection* pc)
     : AudioRtpReceiver(worker_thread,
                        receiver_id,
-                       CreateStreamsFromIds(std::move(stream_ids))) {}
+                       CreateStreamsFromIds(std::move(stream_ids)), pc) {}
 
 AudioRtpReceiver::AudioRtpReceiver(
     rtc::Thread* worker_thread,
     const std::string& receiver_id,
-    const std::vector<rtc::scoped_refptr<MediaStreamInterface>>& streams)
+    const std::vector<rtc::scoped_refptr<MediaStreamInterface>>& streams, PeerConnection* pc)
     : worker_thread_(worker_thread),
       id_(receiver_id),
       source_(new rtc::RefCountedObject<RemoteAudioSource>(worker_thread)),
-      track_(AudioTrackProxy::Create(rtc::Thread::Current(),
-                                     AudioTrack::Create(receiver_id, source_))),
+      track_(AudioTrackProxy::Create(rtc::Thread::Current(), AudioTrack::Create(receiver_id, source_, pc))),
       cached_track_enabled_(track_->enabled()),
       attachment_id_(GenerateUniqueId()),
       delay_(JitterBufferDelayProxy::Create(
@@ -52,6 +52,9 @@ AudioRtpReceiver::AudioRtpReceiver(
           new rtc::RefCountedObject<JitterBufferDelay>(worker_thread))) {
   RTC_DCHECK(worker_thread_);
   RTC_DCHECK(track_->GetSource()->remote());
+  this->pc_ = pc;
+  RTC_LOG(LS_INFO) << "hgy:obj=" << this << " " << __func__ << " pc = " << pc;
+
   track_->RegisterObserver(this);
   track_->GetSource()->RegisterAudioObserver(this);
   SetStreams(streams);
@@ -60,6 +63,7 @@ AudioRtpReceiver::AudioRtpReceiver(
 AudioRtpReceiver::~AudioRtpReceiver() {
   track_->GetSource()->UnregisterAudioObserver(this);
   track_->UnregisterObserver(this);
+  RTC_LOG(LS_INFO) << "hgy:obj=" << this << " " << __func__;
   Stop();
 }
 

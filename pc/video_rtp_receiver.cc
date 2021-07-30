@@ -31,15 +31,17 @@ namespace webrtc {
 
 VideoRtpReceiver::VideoRtpReceiver(rtc::Thread* worker_thread,
                                    std::string receiver_id,
-                                   std::vector<std::string> stream_ids)
+                                   std::vector<std::string> stream_ids,
+                                   PeerConnection* pc)
     : VideoRtpReceiver(worker_thread,
                        receiver_id,
-                       CreateStreamsFromIds(std::move(stream_ids))) {}
+                       CreateStreamsFromIds(std::move(stream_ids)), pc) {}
 
 VideoRtpReceiver::VideoRtpReceiver(
     rtc::Thread* worker_thread,
     const std::string& receiver_id,
-    const std::vector<rtc::scoped_refptr<MediaStreamInterface>>& streams)
+    const std::vector<rtc::scoped_refptr<MediaStreamInterface>>& streams,
+    PeerConnection* pc)
     : worker_thread_(worker_thread),
       id_(receiver_id),
       source_(new RefCountedObject<VideoRtpTrackSource>(this)),
@@ -51,7 +53,7 @@ VideoRtpReceiver::VideoRtpReceiver(
               VideoTrackSourceProxy::Create(rtc::Thread::Current(),
                                             worker_thread,
                                             source_),
-              worker_thread))),
+              worker_thread, pc))),
       attachment_id_(GenerateUniqueId()),
       delay_(JitterBufferDelayProxy::Create(
           rtc::Thread::Current(),

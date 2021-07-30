@@ -22,6 +22,8 @@
 
 namespace webrtc {
 
+class PeerConnection;
+
 // Implementation of the public RtpTransceiverInterface.
 //
 // The RtpTransceiverInterface is only intended to be used with a PeerConnection
@@ -60,13 +62,14 @@ class RtpTransceiver final
   // channel set.
   // |media_type| specifies the type of RtpTransceiver (and, by transitivity,
   // the type of senders, receivers, and channel). Can either by audio or video.
-  explicit RtpTransceiver(cricket::MediaType media_type);
+  explicit RtpTransceiver(cricket::MediaType media_type, PeerConnection *pc);
   // Construct a Unified Plan-style RtpTransceiver with the given sender and
   // receiver. The media type will be derived from the media types of the sender
   // and receiver. The sender and receiver should have the same media type.
   // |HeaderExtensionsToOffer| is used for initializing the return value of
   // HeaderExtensionsToOffer().
   RtpTransceiver(
+      PeerConnection *pc,
       rtc::scoped_refptr<RtpSenderProxyWithInternal<RtpSenderInternal>> sender,
       rtc::scoped_refptr<RtpReceiverProxyWithInternal<RtpReceiverInternal>>
           receiver,
@@ -221,6 +224,7 @@ class RtpTransceiver final
   cricket::ChannelManager* channel_manager_ = nullptr;
   std::vector<RtpCodecCapability> codec_preferences_;
   std::vector<RtpHeaderExtensionCapability> HeaderExtensionsToOffer_;
+  PeerConnection *p;
 };
 
 BEGIN_SIGNALING_PROXY_MAP(RtpTransceiver)

@@ -31,18 +31,22 @@
 
 namespace webrtc {
 
+class PeerConnection;
+
 class AudioRtpReceiver : public ObserverInterface,
                          public AudioSourceInterface::AudioObserver,
                          public rtc::RefCountedObject<RtpReceiverInternal> {
  public:
   AudioRtpReceiver(rtc::Thread* worker_thread,
                    std::string receiver_id,
-                   std::vector<std::string> stream_ids);
+                   std::vector<std::string> stream_ids,
+                   PeerConnection* pc);
   // TODO(https://crbug.com/webrtc/9480): Remove this when streams() is removed.
   AudioRtpReceiver(
       rtc::Thread* worker_thread,
       const std::string& receiver_id,
-      const std::vector<rtc::scoped_refptr<MediaStreamInterface>>& streams);
+      const std::vector<rtc::scoped_refptr<MediaStreamInterface>>& streams,
+      PeerConnection* pc);
   virtual ~AudioRtpReceiver();
 
   // ObserverInterface implementation
@@ -133,6 +137,7 @@ class AudioRtpReceiver : public ObserverInterface,
   rtc::scoped_refptr<JitterBufferDelayInterface> delay_;
   rtc::scoped_refptr<FrameTransformerInterface> frame_transformer_
       RTC_GUARDED_BY(worker_thread_);
+  PeerConnection* pc_;
 };
 
 }  // namespace webrtc

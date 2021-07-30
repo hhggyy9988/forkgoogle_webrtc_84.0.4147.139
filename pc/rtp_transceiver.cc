@@ -20,8 +20,13 @@
 #include "pc/rtp_parameters_conversion.h"
 #include "rtc_base/checks.h"
 #include "rtc_base/logging.h"
+#include "pc/peer_connection.h" //
+
 
 namespace webrtc {
+
+class PeerConnection;
+
 namespace {
 template <class T>
 RTCError VerifyCodecPreferences(const std::vector<RtpCodecCapability>& codecs,
@@ -99,30 +104,35 @@ RTCError VerifyCodecPreferences(const std::vector<RtpCodecCapability>& codecs,
 
 }  // namespace
 
-RtpTransceiver::RtpTransceiver(cricket::MediaType media_type)
-    : unified_plan_(false), media_type_(media_type) {
+RtpTransceiver::RtpTransceiver(cricket::MediaType media_type, PeerConnection *pc)
+    : unified_plan_(false), media_type_(media_type),p(pc) {
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " RtpTransceiver ctor1 pc = " << p << " media_type = " << media_type;
   RTC_DCHECK(media_type == cricket::MEDIA_TYPE_AUDIO ||
              media_type == cricket::MEDIA_TYPE_VIDEO);
 }
 
 RtpTransceiver::RtpTransceiver(
+    PeerConnection *pc,
     rtc::scoped_refptr<RtpSenderProxyWithInternal<RtpSenderInternal>> sender,
-    rtc::scoped_refptr<RtpReceiverProxyWithInternal<RtpReceiverInternal>>
-        receiver,
+    rtc::scoped_refptr<RtpReceiverProxyWithInternal<RtpReceiverInternal>> receiver,
     cricket::ChannelManager* channel_manager,
     std::vector<RtpHeaderExtensionCapability> header_extensions_offered)
     : unified_plan_(true),
       media_type_(sender->media_type()),
       channel_manager_(channel_manager),
       HeaderExtensionsToOffer_(std::move(header_extensions_offered)) {
-  RTC_DCHECK(media_type_ == cricket::MEDIA_TYPE_AUDIO ||
-             media_type_ == cricket::MEDIA_TYPE_VIDEO);
+  this->p = pc;
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " RtpTransceiver ctor2 pc = " << p << " media_type = " << media_type_;
+ 
+  RTC_DCHECK(media_type_ == cricket::MEDIA_TYPE_AUDIO || media_type_ == cricket::MEDIA_TYPE_VIDEO);
   RTC_DCHECK_EQ(sender->media_type(), receiver->media_type());
+
   senders_.push_back(sender);
   receivers_.push_back(receiver);
 }
 
 RtpTransceiver::~RtpTransceiver() {
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " RtpTransceiver dtor";
   Stop();
 }
 
@@ -131,6 +141,7 @@ void RtpTransceiver::SetChannel(cricket::ChannelInterface* channel) {
   if (stopped_ && channel) {
     return;
   }
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
 
   if (channel) {
     RTC_DCHECK_EQ(media_type(), channel->media_type());
@@ -169,11 +180,13 @@ void RtpTransceiver::AddSender(
   RTC_DCHECK(sender);
   RTC_DCHECK_EQ(media_type(), sender->media_type());
   RTC_DCHECK(!absl::c_linear_search(senders_, sender));
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
   senders_.push_back(sender);
 }
 
 bool RtpTransceiver::RemoveSender(RtpSenderInterface* sender) {
   RTC_DCHECK(!unified_plan_);
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
   if (sender) {
     RTC_DCHECK_EQ(media_type(), sender->media_type());
   }
@@ -194,11 +207,13 @@ void RtpTransceiver::AddReceiver(
   RTC_DCHECK(receiver);
   RTC_DCHECK_EQ(media_type(), receiver->media_type());
   RTC_DCHECK(!absl::c_linear_search(receivers_, receiver));
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
   receivers_.push_back(receiver);
 }
 
 bool RtpTransceiver::RemoveReceiver(RtpReceiverInterface* receiver) {
   RTC_DCHECK(!unified_plan_);
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
   if (receiver) {
     RTC_DCHECK_EQ(media_type(), receiver->media_type());
   }
@@ -219,6 +234,7 @@ bool RtpTransceiver::RemoveReceiver(RtpReceiverInterface* receiver) {
 rtc::scoped_refptr<RtpSenderInternal> RtpTransceiver::sender_internal() const {
   RTC_DCHECK(unified_plan_);
   RTC_CHECK_EQ(1u, senders_.size());
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
   return senders_[0]->internal();
 }
 
@@ -226,6 +242,7 @@ rtc::scoped_refptr<RtpReceiverInternal> RtpTransceiver::receiver_internal()
     const {
   RTC_DCHECK(unified_plan_);
   RTC_CHECK_EQ(1u, receivers_.size());
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
   return receivers_[0]->internal();
 }
 
@@ -239,6 +256,7 @@ absl::optional<std::string> RtpTransceiver::mid() const {
 
 void RtpTransceiver::OnFirstPacketReceived(cricket::ChannelInterface*) {
   for (const auto& receiver : receivers_) {
+  	RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
     receiver->internal()->NotifyFirstPacketReceived();
   }
 }
@@ -246,16 +264,19 @@ void RtpTransceiver::OnFirstPacketReceived(cricket::ChannelInterface*) {
 rtc::scoped_refptr<RtpSenderInterface> RtpTransceiver::sender() const {
   RTC_DCHECK(unified_plan_);
   RTC_CHECK_EQ(1u, senders_.size());
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
   return senders_[0];
 }
 
 rtc::scoped_refptr<RtpReceiverInterface> RtpTransceiver::receiver() const {
   RTC_DCHECK(unified_plan_);
   RTC_CHECK_EQ(1u, receivers_.size());
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
   return receivers_[0];
 }
 
 void RtpTransceiver::set_current_direction(RtpTransceiverDirection direction) {
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
   RTC_LOG(LS_INFO) << "Changing transceiver (MID=" << mid_.value_or("<not set>")
                    << ") current direction from "
                    << (current_direction_ ? RtpTransceiverDirectionToString(
@@ -282,6 +303,7 @@ RtpTransceiverDirection RtpTransceiver::direction() const {
 }
 
 void RtpTransceiver::SetDirection(RtpTransceiverDirection new_direction) {
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
   if (stopped()) {
     return;
   }
@@ -316,6 +338,7 @@ void RtpTransceiver::Stop() {
 RTCError RtpTransceiver::SetCodecPreferences(
     rtc::ArrayView<RtpCodecCapability> codec_capabilities) {
   RTC_DCHECK(unified_plan_);
+  RTC_LOG(LS_INFO) << "hgy: obj = " << this << " " << __func__ << " p = " << p;
 
   // 3. If codecs is an empty list, set transceiver's [[PreferredCodecs]] slot
   // to codecs and abort these steps.

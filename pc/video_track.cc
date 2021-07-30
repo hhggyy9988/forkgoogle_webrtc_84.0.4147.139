@@ -17,17 +17,20 @@
 #include "rtc_base/checks.h"
 #include "rtc_base/location.h"
 #include "rtc_base/ref_counted_object.h"
+#include "rtc_base/logging.h"
 
 namespace webrtc {
 
 VideoTrack::VideoTrack(const std::string& label,
                        VideoTrackSourceInterface* video_source,
-                       rtc::Thread* worker_thread)
+                       rtc::Thread* worker_thread,
+                       PeerConnection* pc)
     : MediaStreamTrack<VideoTrackInterface>(label),
       worker_thread_(worker_thread),
       video_source_(video_source),
       content_hint_(ContentHint::kNone) {
   video_source_->RegisterObserver(this);
+  RTC_LOG(LS_INFO) << "hgy:obj=" << this << " " << __func__ << " pc = "  << pc;
 }
 
 VideoTrack::~VideoTrack() {
@@ -93,9 +96,10 @@ void VideoTrack::OnChanged() {
 rtc::scoped_refptr<VideoTrack> VideoTrack::Create(
     const std::string& id,
     VideoTrackSourceInterface* source,
-    rtc::Thread* worker_thread) {
+    rtc::Thread* worker_thread,
+    PeerConnection* pc) {
   rtc::RefCountedObject<VideoTrack>* track =
-      new rtc::RefCountedObject<VideoTrack>(id, source, worker_thread);
+      new rtc::RefCountedObject<VideoTrack>(id, source, worker_thread, pc);
   return track;
 }
 

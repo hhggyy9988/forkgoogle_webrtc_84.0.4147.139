@@ -130,8 +130,7 @@ class RTC_EXPORT RtpTransceiverInterface : public rtc::RefCountInterface {
   // with SetOfferedRtpHeaderExtensions, or a default set if it has not been
   // called.
   // https://w3c.github.io/webrtc-extensions/#rtcrtptransceiver-interface
-  virtual std::vector<RtpHeaderExtensionCapability> HeaderExtensionsToOffer()
-      const;
+  virtual std::vector<RtpHeaderExtensionCapability> HeaderExtensionsToOffer() const;
 
  protected:
   ~RtpTransceiverInterface() override = default;

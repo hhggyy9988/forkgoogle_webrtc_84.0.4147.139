@@ -25,6 +25,8 @@
 #include "rtc_base/thread_checker.h"
 
 namespace webrtc {
+//
+class PeerConnection;
 
 class VideoTrack : public MediaStreamTrack<VideoTrackInterface>,
                    public rtc::VideoSourceBase,
@@ -33,7 +35,7 @@ class VideoTrack : public MediaStreamTrack<VideoTrackInterface>,
   static rtc::scoped_refptr<VideoTrack> Create(
       const std::string& label,
       VideoTrackSourceInterface* source,
-      rtc::Thread* worker_thread);
+      rtc::Thread* worker_thread, PeerConnection* pc);
 
   void AddOrUpdateSink(rtc::VideoSinkInterface<VideoFrame>* sink,
                        const rtc::VideoSinkWants& wants) override;
@@ -50,7 +52,7 @@ class VideoTrack : public MediaStreamTrack<VideoTrackInterface>,
  protected:
   VideoTrack(const std::string& id,
              VideoTrackSourceInterface* video_source,
-             rtc::Thread* worker_thread);
+             rtc::Thread* worker_thread, PeerConnection* pc);
   ~VideoTrack();
 
  private:

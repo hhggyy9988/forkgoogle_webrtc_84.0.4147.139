@@ -35,6 +35,8 @@
 #include "rtc_base/thread.h"
 
 namespace webrtc {
+//
+class PeerConnection;
 
 class VideoRtpReceiver : public rtc::RefCountedObject<RtpReceiverInternal>,
                          public VideoRtpTrackSource::Callback {
@@ -43,13 +45,13 @@ class VideoRtpReceiver : public rtc::RefCountedObject<RtpReceiverInternal>,
   // sees. Must be called on signaling thread.
   VideoRtpReceiver(rtc::Thread* worker_thread,
                    std::string receiver_id,
-                   std::vector<std::string> streams_ids);
+                   std::vector<std::string> streams_ids, PeerConnection* pc);
   // TODO(hbos): Remove this when streams() is removed.
   // https://crbug.com/webrtc/9480
   VideoRtpReceiver(
       rtc::Thread* worker_thread,
       const std::string& receiver_id,
-      const std::vector<rtc::scoped_refptr<MediaStreamInterface>>& streams);
+      const std::vector<rtc::scoped_refptr<MediaStreamInterface>>& streams, PeerConnection* pc);
 
   virtual ~VideoRtpReceiver();
 

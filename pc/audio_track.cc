@@ -12,19 +12,21 @@
 
 #include "rtc_base/checks.h"
 #include "rtc_base/ref_counted_object.h"
+#include "rtc_base/logging.h"
 
 namespace webrtc {
 
 // static
 rtc::scoped_refptr<AudioTrack> AudioTrack::Create(
     const std::string& id,
-    const rtc::scoped_refptr<AudioSourceInterface>& source) {
-  return new rtc::RefCountedObject<AudioTrack>(id, source);
+    const rtc::scoped_refptr<AudioSourceInterface>& source, PeerConnection* pc) {
+  return new rtc::RefCountedObject<AudioTrack>(id, source, pc);
 }
 
 AudioTrack::AudioTrack(const std::string& label,
-                       const rtc::scoped_refptr<AudioSourceInterface>& source)
+                       const rtc::scoped_refptr<AudioSourceInterface>& source, PeerConnection* pc)
     : MediaStreamTrack<AudioTrackInterface>(label), audio_source_(source) {
+  RTC_LOG(LS_INFO) << "hgy:obj=" << this << " " << __func__ << " pc = " << pc;
   if (audio_source_) {
     audio_source_->RegisterObserver(this);
     OnChanged();

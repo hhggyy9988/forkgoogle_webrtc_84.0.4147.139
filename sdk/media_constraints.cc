@@ -158,29 +158,18 @@ void CopyConstraintsIntoRtcConfiguration(
   }
 
   bool enable_ipv6;
-  if (FindConstraint(constraints, MediaConstraints::kEnableIPv6, &enable_ipv6,
-                     nullptr)) {
+  if (FindConstraint(constraints, MediaConstraints::kEnableIPv6, &enable_ipv6, nullptr)) {
     configuration->disable_ipv6 = !enable_ipv6;
   }
-  FindConstraint(constraints, MediaConstraints::kEnableDscp,
-                 &configuration->media_config.enable_dscp, nullptr);
-  FindConstraint(constraints, MediaConstraints::kCpuOveruseDetection,
-                 &configuration->media_config.video.enable_cpu_adaptation,
+  FindConstraint(constraints, MediaConstraints::kEnableDscp, &configuration->media_config.enable_dscp, nullptr);
+  FindConstraint(constraints, MediaConstraints::kCpuOveruseDetection, &configuration->media_config.video.enable_cpu_adaptation,
                  nullptr);
-  FindConstraint(constraints, MediaConstraints::kEnableRtpDataChannels,
-                 &configuration->enable_rtp_data_channel, nullptr);
+  FindConstraint(constraints, MediaConstraints::kEnableRtpDataChannels, &configuration->enable_rtp_data_channel, nullptr);
   // Find Suspend Below Min Bitrate constraint.
-  FindConstraint(
-      constraints, MediaConstraints::kEnableVideoSuspendBelowMinBitrate,
-      &configuration->media_config.video.suspend_below_min_bitrate, nullptr);
-  ConstraintToOptional<int>(constraints,
-                            MediaConstraints::kScreencastMinBitrate,
-                            &configuration->screencast_min_bitrate);
-  ConstraintToOptional<bool>(constraints,
-                             MediaConstraints::kCombinedAudioVideoBwe,
-                             &configuration->combined_audio_video_bwe);
-  ConstraintToOptional<bool>(constraints, MediaConstraints::kEnableDtlsSrtp,
-                             &configuration->enable_dtls_srtp);
+  FindConstraint(constraints, MediaConstraints::kEnableVideoSuspendBelowMinBitrate, &configuration->media_config.video.suspend_below_min_bitrate, nullptr);
+  ConstraintToOptional<int>(constraints, MediaConstraints::kScreencastMinBitrate, &configuration->screencast_min_bitrate);
+  ConstraintToOptional<bool>(constraints, MediaConstraints::kCombinedAudioVideoBwe,  &configuration->combined_audio_video_bwe);
+  ConstraintToOptional<bool>(constraints, MediaConstraints::kEnableDtlsSrtp,  &configuration->enable_dtls_srtp);
 }
 
 void CopyConstraintsIntoAudioOptions(const MediaConstraints* constraints,

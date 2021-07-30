@@ -45,6 +45,7 @@
 #include "rtc_base/experiments/field_trial_units.h"
 #include "rtc_base/numerics/safe_conversions.h"
 #include "rtc_base/system/file_wrapper.h"
+#include "rtc_base/logging.h"
 
 namespace webrtc {
 
@@ -305,16 +306,18 @@ PeerConnectionFactory::CreatePeerConnection(
 rtc::scoped_refptr<MediaStreamInterface>
 PeerConnectionFactory::CreateLocalMediaStream(const std::string& stream_id) {
   RTC_DCHECK(signaling_thread_->IsCurrent());
-  return MediaStreamProxy::Create(signaling_thread_,
-                                  MediaStream::Create(stream_id));
+  RTC_LOG(LS_INFO) << "hgy:obj=" << this << " " << __func__ << " stream_id " << stream_id;  
+  return MediaStreamProxy::Create(signaling_thread_, MediaStream::Create(stream_id));
 }
 
 rtc::scoped_refptr<VideoTrackInterface> PeerConnectionFactory::CreateVideoTrack(
     const std::string& id,
     VideoTrackSourceInterface* source) {
   RTC_DCHECK(signaling_thread_->IsCurrent());
+  RTC_LOG(LS_INFO) << "hgy:obj=" << this << " " << __func__<< " id " << id;
+  
   rtc::scoped_refptr<VideoTrackInterface> track(
-      VideoTrack::Create(id, source, worker_thread_));
+      VideoTrack::Create(id, source, worker_thread_, NULL));
   return VideoTrackProxy::Create(signaling_thread_, worker_thread_, track);
 }
 
@@ -322,7 +325,8 @@ rtc::scoped_refptr<AudioTrackInterface> PeerConnectionFactory::CreateAudioTrack(
     const std::string& id,
     AudioSourceInterface* source) {
   RTC_DCHECK(signaling_thread_->IsCurrent());
-  rtc::scoped_refptr<AudioTrackInterface> track(AudioTrack::Create(id, source));
+  RTC_LOG(LS_INFO) << "hgy:obj=" << this << " " << __func__ << " id " << id;
+  rtc::scoped_refptr<AudioTrackInterface> track(AudioTrack::Create(id, source, NULL));
   return AudioTrackProxy::Create(signaling_thread_, track);
 }
 

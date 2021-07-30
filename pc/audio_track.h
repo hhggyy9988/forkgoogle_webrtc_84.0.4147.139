@@ -20,19 +20,21 @@
 #include "rtc_base/thread_checker.h"
 
 namespace webrtc {
+//
+class PeerConnection;
 
 class AudioTrack : public MediaStreamTrack<AudioTrackInterface>,
                    public ObserverInterface {
  protected:
   // Protected ctor to force use of factory method.
   AudioTrack(const std::string& label,
-             const rtc::scoped_refptr<AudioSourceInterface>& source);
+             const rtc::scoped_refptr<AudioSourceInterface>& source, PeerConnection* pc);
   ~AudioTrack() override;
 
  public:
   static rtc::scoped_refptr<AudioTrack> Create(
       const std::string& id,
-      const rtc::scoped_refptr<AudioSourceInterface>& source);
+      const rtc::scoped_refptr<AudioSourceInterface>& source, PeerConnection* pc);
 
  private:
   // MediaStreamTrack implementation.

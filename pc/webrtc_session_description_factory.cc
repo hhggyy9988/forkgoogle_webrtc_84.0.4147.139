@@ -369,6 +369,14 @@ void WebRtcSessionDescriptionFactory::InternalCreateOffer(
       }
     }
   }
+
+  {//scope
+     if(!!offer){
+         std::string offersdp;
+         offer->ToString(&offersdp);
+         VLOG(1) << __func__ << " offer = " << offersdp;
+     }
+  }
   PostCreateSessionDescriptionSucceeded(request.observer, std::move(offer));
 }
 
@@ -400,8 +408,7 @@ void WebRtcSessionDescriptionFactory::InternalCreateAnswer(
           pc_->local_description() ? pc_->local_description()->description()
                                    : nullptr);
   if (!desc) {
-    PostCreateSessionDescriptionFailed(request.observer,
-                                       "Failed to initialize the answer.");
+    PostCreateSessionDescriptionFailed(request.observer,"Failed to initialize the answer.");
     return;
   }
 
@@ -427,6 +434,15 @@ void WebRtcSessionDescriptionFactory::InternalCreateAnswer(
       }
     }
   }
+
+  {//scope
+     if(!!answer){
+         std::string answersdp;
+         answer->ToString(&answersdp);
+         VLOG(1) << __func__ << " answer = " << answersdp;
+     }
+  }
+  
   PostCreateSessionDescriptionSucceeded(request.observer, std::move(answer));
 }
 

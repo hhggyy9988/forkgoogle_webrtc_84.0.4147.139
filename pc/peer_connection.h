@@ -207,15 +207,18 @@ class PeerConnection : public PeerConnectionInternal,
                    const RTCOfferAnswerOptions& options) override;
   void CreateAnswer(CreateSessionDescriptionObserver* observer,
                     const RTCOfferAnswerOptions& options) override;
+  
   void SetLocalDescription(SetSessionDescriptionObserver* observer,
                            SessionDescriptionInterface* desc) override;
   void SetLocalDescription(SetSessionDescriptionObserver* observer) override;
+
   void SetRemoteDescription(SetSessionDescriptionObserver* observer,
                             SessionDescriptionInterface* desc) override;
   void SetRemoteDescription(
       std::unique_ptr<SessionDescriptionInterface> desc,
       rtc::scoped_refptr<SetRemoteDescriptionObserverInterface> observer)
       override;
+
   PeerConnectionInterface::RTCConfiguration GetConfiguration() override;
   RTCError SetConfiguration(
       const PeerConnectionInterface::RTCConfiguration& configuration) override;
@@ -1343,8 +1346,6 @@ class PeerConnection : public PeerConnectionInternal,
 
   // Whether this peer is the caller. Set when the local description is applied.
   absl::optional<bool> is_caller_ RTC_GUARDED_BY(signaling_thread());
-
-
 
   std::unique_ptr<SessionDescriptionInterface> current_local_description_
       RTC_GUARDED_BY(signaling_thread());
